@@ -1,0 +1,5 @@
+numpy
+matplotlib
+jupyter
+# Optional for deeper experiments:
+# brainpy
