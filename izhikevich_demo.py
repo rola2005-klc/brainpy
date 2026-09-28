@@ -59,7 +59,8 @@ def simulate_izhikevich(total_ms: int = 250, dt: float = 0.25):
 def main():
     times, voltage, _, spikes = simulate_izhikevich()
 
-    output_dir = Path("outputs")
+    repo_dir = Path(__file__).resolve().parent
+    output_dir = repo_dir / "outputs"
     output_dir.mkdir(exist_ok=True)
     output_path = output_dir / "izhikevich_voltage_trace.png"
 
@@ -75,7 +76,7 @@ def main():
 
     print(f"Simulated {len(times)} time steps")
     print(f"Spike count: {len(spikes)}")
-    print(f"Saved plot: {output_path}")
+    print(f"Saved plot: {output_path.relative_to(repo_dir)}")
 
 
 if __name__ == "__main__":
