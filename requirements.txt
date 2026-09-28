@@ -1,5 +1,10 @@
-numpy
-matplotlib
+# Tested with Python 3.11. The versions are pinned because BrainPy's API has
+# moved since the book was written (e.g. update(tdi) -> bp.share.load('t')).
+numpy==2.4.6
+matplotlib==3.11.2
+pytest==9.1.1
+brainpy==2.8.2
+jax[cpu]==0.10.2
 jupyter
-# Optional for deeper experiments:
-# brainpy
+# Installs this repo's `neuromodels` package in editable mode.
+-e .
