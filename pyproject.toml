@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "neuromodels"
+version = "0.1.0"
+description = "Neuron, synapse, and network models worked through with BrainPy"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["numpy", "matplotlib", "brainpy>=2.8,<3", "jax"]
+
+[tool.setuptools.packages.find]
+include = ["neuromodels*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+filterwarnings = ["ignore::DeprecationWarning", "ignore::FutureWarning"]
