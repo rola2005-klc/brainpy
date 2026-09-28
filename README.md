@@ -27,11 +27,32 @@ summarized in a study note.
 Each chapter has a script in [`scripts/`](scripts) that saves its figures to
 [`outputs/`](outputs) and prints its key numbers.
 
+## Beyond the course: does a mouse drink or eat?
+
+A mouse that is both hungry and thirsty, offered water or food on every trial,
+drinks in bouts, eats in bouts, and switches between them at random times
+(Richman et al. 2023). [Chapter 13](notes/13_need_choice.md) reuses the day-5–6
+decision circuit as a goal-selection circuit: thirst and hunger drive two goal
+populations, and every reward lowers its need.
+
+The model produces bouts from attractor persistence (stay probability 0.90–0.97,
+against 0.49 when each session's choices are shuffled), serves the larger need
+first, and stops when the needs can no longer sustain a goal. It also makes a
+testable prediction: with little noise, drinking gives way to eating only once
+thirst has fallen 0.15 below hunger (median), and eating gives way to drinking
+at the mirror point, whereas noise-driven switching happens where the needs are
+about equal.
+
+**Status:** not yet fitted to data. The parameters are placeholders until the
+model is fitted to the open behavioural data of Richman et al. (2023).
+
+![Goal landscape at four need states](outputs/13_need_choice_landscape.png)
+
 ![Class 1 and class 2 F-I curves](outputs/03_fi_curves.png)
 
 ## How the results are checked
 
-Every model has tests in [`tests/`](tests): 129 of them, about 1.5 minutes on a
+Every model has tests in [`tests/`](tests): 138 of them, about 2 minutes on a
 4-core CPU with `pytest`. The tests compare simulations against one of three
 references rather than against numbers saved from an earlier run:
 
@@ -96,7 +117,7 @@ Saved plot: outputs/izhikevich_voltage_trace.png
 ```text
 neuromodels/        models and analysis, one module per course topic
   utils.py          run helper with aligned time stamps, inputs, spike statistics, figure style
-  networks/         network models (days 5–6)
+  networks/         network models (days 5–6) and the drink-or-eat model (chapter 13)
   training/         RNN and spiking-network training (day 7)
 scripts/            one script per chapter; figures go to outputs/
 tests/              checks against closed forms, BrainPy built-ins, and theory
@@ -114,7 +135,8 @@ so it does not run as-is.
 - **June 2025**: repository created; exploratory notebook added.
 - **April 2026**: README and the NumPy Izhikevich demo.
 - **September 2026**: full pass through the course: the `neuromodels` package,
-  chapter scripts, tests, and study notes.
+  chapter scripts, tests, and study notes; a first rate model of drink-or-eat
+  choices (chapter 13).
 
 ## Limitations
 
