@@ -69,22 +69,34 @@ def step_current(duration: float, dt: float, amplitude, onset: float = 0.0, offs
     return np.multiply.outer(on, np.asarray(amplitude, dtype=float))
 
 
-def run(model, inputs, dt: float, monitors: Sequence[str] = ("V", "spike"), reset: bool = True) -> Dict[str, np.ndarray]:
+def run(model, inputs, dt: float, monitors=("V", "spike"), reset: bool = True) -> Dict[str, np.ndarray]:
     """Run a BrainPy model step by step and return its monitors as NumPy arrays.
 
-    ``inputs`` is an array whose first axis is time; ``inputs[i]`` is passed to
-    ``model.update`` at step ``i``. The returned ``"ts"`` holds end-of-step times
-    (see the module docstring). With ``reset=True`` the model starts from its
-    initial state, so repeated calls give identical results.
+    ``inputs`` is an array whose first axis is time, or a tuple of such arrays;
+    step ``i`` calls ``model.update(inputs[i])`` (or one argument per array).
+    ``monitors`` is a sequence of variable names or a dict mapping names to
+    variables or zero-argument functions, as ``bp.DSRunner`` accepts. The returned
+    ``"ts"`` holds end-of-step times (see the module docstring). With
+    ``reset=True`` the model starts from its initial state, so repeated calls
+    give identical results.
+
+    ``bp.DSRunner`` writes ``dt`` into BrainPy's global settings and leaves
+    traced ``t`` and ``i`` behind in ``bp.share``; this function scopes ``dt`` to
+    the call and leaves the shared clock at the end of the run.
     """
     import brainpy as bp  # imported here so the NumPy-only helpers work without JAX
+    import brainpy.math as bm
 
     if reset:
         bp.reset_state(model)
-    runner = bp.DSRunner(model, monitors=list(monitors), dt=dt, progress_bar=False)
-    runner.run(inputs=np.asarray(inputs))
+    inputs = tuple(np.asarray(x) for x in inputs) if isinstance(inputs, tuple) else np.asarray(inputs)
+    with bm.environment(dt=float(dt)):
+        runner = bp.DSRunner(model, monitors=monitors if isinstance(monitors, dict) else list(monitors),
+                             dt=dt, progress_bar=False)
+        runner.run(inputs=inputs)
     out = {name: np.asarray(runner.mon[name]) for name in monitors}
     out["ts"] = np.asarray(runner.mon.ts) + dt
+    bp.share.save(t=float(out["ts"][-1]), i=len(out["ts"]))
     return out
 
 

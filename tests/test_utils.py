@@ -1,5 +1,7 @@
 import brainpy as bp
+import brainpy.math as bm
 import numpy as np
+import pytest
 
 from neuromodels.utils import cv_isi, firing_rate, run, spike_times, step_current
 
@@ -21,6 +23,20 @@ def test_run_is_repeatable():
     inputs = step_current(100.0, 0.1, 25.0)
     first, second = run(lif, inputs, 0.1), run(lif, inputs, 0.1)
     np.testing.assert_array_equal(first["V"], second["V"])
+
+
+def test_run_leaves_global_state_clean():
+    # DSRunner alone would leave the global dt at 0.05 and traced values in bp.share.
+    before = bm.get_dt()
+    out = run(bp.dyn.Lif(1, V_initializer=bp.init.Constant(0.0)), step_current(10.0, 0.05, 25.0), 0.05)
+    assert bm.get_dt() == before
+    assert float(bp.share.load("t")) == pytest.approx(out["ts"][-1])
+
+
+def test_run_accepts_monitor_functions():
+    lif = bp.dyn.Lif(3, V_initializer=bp.init.Constant(0.0))
+    out = run(lif, step_current(10.0, 0.1, [10.0, 20.0, 30.0]), 0.1, monitors={"V_first": lambda: lif.V[:1]})
+    assert out["V_first"].shape == (100, 1)
 
 
 def test_step_current_edges_use_step_indices():
